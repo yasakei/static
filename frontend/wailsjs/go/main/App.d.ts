@@ -16,6 +16,8 @@ export function GetCoverServerInfo():Promise<Record<string, any>>;
 
 export function GetDiscordRPCStatus():Promise<Record<string, any>>;
 
+export function GetPlaylistPosition(arg1:string):Promise<number>;
+
 export function GetPlaylists():Promise<Array<main.Playlist>>;
 
 export function GetSettings():Promise<main.Settings>;
@@ -23,6 +25,8 @@ export function GetSettings():Promise<main.Settings>;
 export function GetSongFile(arg1:string):Promise<string>;
 
 export function GetSongFileURL(arg1:string,arg2:boolean,arg3:boolean):Promise<string>;
+
+export function GetSongPositions(arg1:string):Promise<Record<string, number>>;
 
 export function GetStaticFolderPath():Promise<string>;
 
@@ -42,4 +46,8 @@ export function UpdateDiscordPresenceWithPosition(arg1:number):Promise<void>;
 
 export function UpdatePlaybackPosition(arg1:number):Promise<void>;
 
+export function UpdatePlaylistPosition(arg1:string,arg2:number):Promise<void>;
+
 export function UpdateSettings(arg1:main.Settings):Promise<void>;
+
+export function UpdateSongPosition(arg1:string,arg2:string,arg3:number):Promise<void>;

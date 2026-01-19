@@ -30,6 +30,10 @@ export function GetDiscordRPCStatus() {
   return window['go']['main']['App']['GetDiscordRPCStatus']();
 }
 
+export function GetPlaylistPosition(arg1) {
+  return window['go']['main']['App']['GetPlaylistPosition'](arg1);
+}
+
 export function GetPlaylists() {
   return window['go']['main']['App']['GetPlaylists']();
 }
@@ -44,6 +48,10 @@ export function GetSongFile(arg1) {
 
 export function GetSongFileURL(arg1, arg2, arg3) {
   return window['go']['main']['App']['GetSongFileURL'](arg1, arg2, arg3);
+}
+
+export function GetSongPositions(arg1) {
+  return window['go']['main']['App']['GetSongPositions'](arg1);
 }
 
 export function GetStaticFolderPath() {
@@ -82,6 +90,14 @@ export function UpdatePlaybackPosition(arg1) {
   return window['go']['main']['App']['UpdatePlaybackPosition'](arg1);
 }
 
+export function UpdatePlaylistPosition(arg1, arg2) {
+  return window['go']['main']['App']['UpdatePlaylistPosition'](arg1, arg2);
+}
+
 export function UpdateSettings(arg1) {
   return window['go']['main']['App']['UpdateSettings'](arg1);
+}
+
+export function UpdateSongPosition(arg1, arg2, arg3) {
+  return window['go']['main']['App']['UpdateSongPosition'](arg1, arg2, arg3);
 }

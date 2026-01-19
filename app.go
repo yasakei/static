@@ -17,6 +17,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -70,13 +71,16 @@ type Song struct {
 	Duration    string `json:"duration"`
 	CoverData   string `json:"coverData,omitempty"` // Base64 encoded cover from MP3
 	DurationSec int    `json:"durationSec,omitempty"`
+	Position    int    `json:"position,omitempty"`   // Position in playlist (1-based)
 }
 
 // PlaylistConfig represents the playlist.toml structure (simplified)
 type PlaylistConfig struct {
-	Name        string `toml:"name" json:"name"`
-	Description string `toml:"description" json:"description"`
-	Cover       string `toml:"cover" json:"cover"` // Path to cover image relative to playlist folder
+	Name        string                 `toml:"name" json:"name"`
+	Description string                 `toml:"description" json:"description"`
+	Cover       string                 `toml:"cover" json:"cover"` // Path to cover image relative to playlist folder
+	Position    int                    `toml:"position" json:"position"` // Current playback position in playlist (0-based)
+	Songs       map[string]int         `toml:"songs" json:"songs"` // filename -> position mapping
 }
 
 // Playlist represents a complete playlist with metadata
@@ -86,6 +90,7 @@ type Playlist struct {
 	FolderPath  string `json:"folderPath"`
 	Songs       []Song `json:"songs"`
 	CoverData   string `json:"coverData,omitempty"` // Base64 encoded playlist cover
+	Position    int    `json:"position"`            // Current position in playlist (0-based)
 }
 
 // Settings represents user preferences
@@ -1371,6 +1376,11 @@ func (a *App) loadPlaylist(playlistDir string) (Playlist, error) {
 		config.Description = "Auto-generated playlist"
 	}
 
+	// Initialize songs map if nil
+	if config.Songs == nil {
+		config.Songs = make(map[string]int)
+	}
+
 	// Load playlist cover if specified
 	var coverData string
 	if config.Cover != "" {
@@ -1409,6 +1419,8 @@ func (a *App) loadPlaylist(playlistDir string) (Playlist, error) {
 
 	// Auto-scan for music files in the musics folder
 	musicsDir := filepath.Join(playlistDir, "musics")
+	var allSongFiles []string
+	
 	if _, err := os.Stat(musicsDir); err == nil {
 		err := filepath.WalkDir(musicsDir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
@@ -1417,13 +1429,7 @@ func (a *App) loadPlaylist(playlistDir string) (Playlist, error) {
 			if !d.IsDir() {
 				ext := strings.ToLower(filepath.Ext(path))
 				if ext == ".mp3" || ext == ".wav" || ext == ".ogg" || ext == ".m4a" || ext == ".flac" {
-					fmt.Printf("Processing audio file: %s\n", path)
-					metadata, err := a.extractMetadata(path)
-					if err == nil {
-						songs = append(songs, metadata)
-					} else {
-						fmt.Printf("Error extracting metadata from %s: %v\n", path, err)
-					}
+					allSongFiles = append(allSongFiles, path)
 				}
 			}
 			return nil
@@ -1433,15 +1439,75 @@ func (a *App) loadPlaylist(playlistDir string) (Playlist, error) {
 		}
 	}
 
+	// Generate positions for songs that don't have them
+	needsUpdate := a.generateSongPositions(playlistDir, allSongFiles, &config)
+
+	// Create songs with positions
+	songMap := make(map[int]Song) // position -> song
+	
+	for _, songPath := range allSongFiles {
+		filename := filepath.Base(songPath)
+		position, exists := config.Songs[filename]
+		
+		if !exists {
+			// This shouldn't happen after generateSongPositions, but just in case
+			position = len(config.Songs) + 1
+			config.Songs[filename] = position
+			needsUpdate = true
+		}
+		
+		fmt.Printf("Processing song: %s at position %d\n", filename, position)
+		metadata, err := a.extractMetadata(songPath)
+		if err == nil {
+			metadata.Position = position
+			songMap[position] = metadata
+		} else {
+			fmt.Printf("Error extracting metadata from %s: %v\n", songPath, err)
+		}
+	}
+	
+	// Convert map to sorted slice
+	var maxPosition int
+	for pos := range songMap {
+		if pos > maxPosition {
+			maxPosition = pos
+		}
+	}
+	
+	for i := 1; i <= maxPosition; i++ {
+		if song, exists := songMap[i]; exists {
+			songs = append(songs, song)
+		}
+	}
+
+	// Save updated config if positions were generated
+	if needsUpdate {
+		fmt.Printf("Saving updated playlist.toml with generated positions\n")
+		err := a.savePlaylistConfig(playlistDir, config)
+		if err != nil {
+			fmt.Printf("Warning: Could not save playlist.toml: %v\n", err)
+		}
+	}
+
 	playlist := Playlist{
 		Name:        config.Name,
 		Description: config.Description,
 		FolderPath:  playlistDir,
 		Songs:       songs,
 		CoverData:   coverData,
+		Position:    config.Position, // Current playback position
 	}
 
-	fmt.Printf("Loaded playlist '%s' with %d songs\n", playlist.Name, len(songs))
+	// Auto-generate position if not set or invalid
+	if playlist.Position < 0 || playlist.Position >= len(songs) {
+		playlist.Position = 0
+		// Save the auto-generated position back to the config
+		if len(songs) > 0 {
+			a.savePlaylistPosition(playlistDir, 0)
+		}
+	}
+
+	fmt.Printf("Loaded playlist '%s' with %d songs, current position: %d\n", playlist.Name, len(songs), playlist.Position)
 	return playlist, nil
 }
 
@@ -1824,6 +1890,156 @@ func (a *App) ScanPlaylistFiles(playlistPath string) (map[string][]string, error
 
 	return result, nil
 }
+// generateSongPositions automatically generates positions for songs that don't have them
+func (a *App) generateSongPositions(playlistDir string, songFiles []string, config *PlaylistConfig) bool {
+	needsUpdate := false
+	nextPosition := 1
+	
+	// Find the highest existing position
+	for _, position := range config.Songs {
+		if position >= nextPosition {
+			nextPosition = position + 1
+		}
+	}
+	
+	// Sort song files by filename for consistent ordering
+	sort.Strings(songFiles)
+	
+	// Generate positions for songs that don't have them
+	for _, songPath := range songFiles {
+		filename := filepath.Base(songPath)
+		
+		if _, exists := config.Songs[filename]; !exists {
+			config.Songs[filename] = nextPosition
+			fmt.Printf("Auto-generated position %d for song: %s\n", nextPosition, filename)
+			nextPosition++
+			needsUpdate = true
+		}
+	}
+	
+	return needsUpdate
+}
+
+// savePlaylistConfig saves the playlist configuration to playlist.toml
+func (a *App) savePlaylistConfig(playlistDir string, config PlaylistConfig) error {
+	playlistFile := filepath.Join(playlistDir, "playlist.toml")
+	
+	// Create the TOML content
+	var buf bytes.Buffer
+	encoder := toml.NewEncoder(&buf)
+	if err := encoder.Encode(config); err != nil {
+		return fmt.Errorf("error encoding playlist.toml: %v", err)
+	}
+	
+	// Write to file
+	err := os.WriteFile(playlistFile, buf.Bytes(), 0644)
+	if err != nil {
+		return fmt.Errorf("error writing playlist.toml: %v", err)
+	}
+	
+	fmt.Printf("Saved playlist config to %s\n", playlistFile)
+	return nil
+}
+
+// generatePlaylistConfig generates a playlist.toml file with song positions
+// savePlaylistPosition saves the current playback position to playlist.toml
+func (a *App) savePlaylistPosition(playlistDir string, position int) error {
+	playlistFile := filepath.Join(playlistDir, "playlist.toml")
+	
+	var config PlaylistConfig
+	
+	// Load existing config if it exists
+	if _, err := os.Stat(playlistFile); err == nil {
+		if _, err := toml.DecodeFile(playlistFile, &config); err != nil {
+			return fmt.Errorf("error parsing existing playlist.toml: %v", err)
+		}
+	}
+	
+	// Initialize songs map if nil
+	if config.Songs == nil {
+		config.Songs = make(map[string]int)
+	}
+	
+	// Update position
+	config.Position = position
+	
+	// Set defaults if not already set
+	if config.Name == "" {
+		config.Name = filepath.Base(playlistDir)
+	}
+	if config.Description == "" {
+		config.Description = "Auto-generated playlist"
+	}
+	
+	// Save updated config
+	return a.savePlaylistConfig(playlistDir, config)
+}
+
+// UpdatePlaylistPosition updates the current playback position in a playlist and saves it
+func (a *App) UpdatePlaylistPosition(playlistPath string, position int) error {
+	return a.savePlaylistPosition(playlistPath, position)
+}
+
+// GetPlaylistPosition returns the current playback position for a playlist
+func (a *App) GetPlaylistPosition(playlistPath string) (int, error) {
+	playlistFile := filepath.Join(playlistPath, "playlist.toml")
+	
+	var config PlaylistConfig
+	
+	// Load existing config if it exists
+	if _, err := os.Stat(playlistFile); err == nil {
+		if _, err := toml.DecodeFile(playlistFile, &config); err != nil {
+			return 0, fmt.Errorf("error parsing playlist.toml: %v", err)
+		}
+	}
+	
+	return config.Position, nil
+}
+func (a *App) UpdateSongPosition(playlistPath string, songFilename string, newPosition int) error {
+	playlistFile := filepath.Join(playlistPath, "playlist.toml")
+	
+	var config PlaylistConfig
+	
+	// Load existing config
+	if _, err := os.Stat(playlistFile); err == nil {
+		if _, err := toml.DecodeFile(playlistFile, &config); err != nil {
+			return fmt.Errorf("error parsing playlist.toml: %v", err)
+		}
+	}
+	
+	// Initialize songs map if nil
+	if config.Songs == nil {
+		config.Songs = make(map[string]int)
+	}
+	
+	// Update the song position
+	config.Songs[songFilename] = newPosition
+	
+	// Save updated config
+	return a.savePlaylistConfig(playlistPath, config)
+}
+
+// GetSongPositions returns all song positions for a playlist
+func (a *App) GetSongPositions(playlistPath string) (map[string]int, error) {
+	playlistFile := filepath.Join(playlistPath, "playlist.toml")
+	
+	var config PlaylistConfig
+	
+	// Load existing config
+	if _, err := os.Stat(playlistFile); err == nil {
+		if _, err := toml.DecodeFile(playlistFile, &config); err != nil {
+			return nil, fmt.Errorf("error parsing playlist.toml: %v", err)
+		}
+	}
+	
+	// Initialize if nil
+	if config.Songs == nil {
+		config.Songs = make(map[string]int)
+	}
+	
+	return config.Songs, nil
+}
+
 // Cleanup shuts down the cover art server gracefully
 func (a *App) Cleanup() {
 	if a.coverServer != nil {

@@ -15,7 +15,7 @@ import {
   ChevronRight,
   Cat
 } from 'lucide-react'
-import { GetPlaylists, GetSongFileURL, NotifyPlaybackState, UpdatePlaybackPosition, GetSettings, UpdateSettings, CheckFFmpegInstalled, ClearAudioCache, GetCacheInfo } from '../wailsjs/go/main/App'
+import { GetPlaylists, GetSongFileURL, NotifyPlaybackState, UpdatePlaybackPosition, GetSettings, UpdateSettings, CheckFFmpegInstalled, ClearAudioCache, GetCacheInfo, UpdatePlaylistPosition, GetPlaylistPosition } from '../wailsjs/go/main/App'
 import { LogPrint as WailsLogPrint } from '../wailsjs/runtime/runtime'
 
 // Fallback for development mode
@@ -494,8 +494,19 @@ function App() {
       LogPrint(`Received playlist data: ${JSON.stringify(playlistData)}`)
       setPlaylists(playlistData || [])
       if (playlistData && playlistData.length > 0) {
-        setSelectedPlaylist(playlistData[0])
-        LogPrint(`Selected first playlist: ${playlistData[0].name}`)
+        const firstPlaylist = playlistData[0]
+        setSelectedPlaylist(firstPlaylist)
+        
+        // Auto-start from saved position if available
+        if (firstPlaylist.songs && firstPlaylist.songs.length > 0) {
+          const startPosition = firstPlaylist.position || 0
+          if (startPosition >= 0 && startPosition < firstPlaylist.songs.length) {
+            setCurrentSongIndex(startPosition)
+            LogPrint(`Auto-loaded playlist position: ${startPosition}`)
+          }
+        }
+        
+        LogPrint(`Selected first playlist: ${firstPlaylist.name}`)
       } else {
         LogPrint('No playlists found')
       }
@@ -537,6 +548,18 @@ function App() {
       
       setCurrentSong({ ...song, dataURL })
       setCurrentSongIndex(index)
+      
+      // Save the position to playlist.toml
+      if (selectedPlaylist && selectedPlaylist.folderPath) {
+        try {
+          await UpdatePlaylistPosition(selectedPlaylist.folderPath, index)
+          LogPrint(`Saved playlist position: ${index}`)
+          // Update the local playlist state
+          setSelectedPlaylist(prev => ({ ...prev, position: index }))
+        } catch (err) {
+          LogPrint(`Error saving playlist position: ${err.message}`)
+        }
+      }
       
       if (audio) {
         LogPrint('Setting audio source...')
@@ -812,7 +835,19 @@ function App() {
               {playlists.map((playlist, index) => (
                 <div
                   key={index}
-                  onClick={() => setSelectedPlaylist(playlist)}
+                  onClick={() => {
+                    setSelectedPlaylist(playlist)
+                    // Set current song index to saved position
+                    if (playlist.songs && playlist.songs.length > 0) {
+                      const savedPosition = playlist.position || 0
+                      if (savedPosition >= 0 && savedPosition < playlist.songs.length) {
+                        setCurrentSongIndex(savedPosition)
+                        LogPrint(`Loaded saved position for ${playlist.name}: ${savedPosition}`)
+                      } else {
+                        setCurrentSongIndex(0)
+                      }
+                    }
+                  }}
                   className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-all ${
                     selectedPlaylist?.name === playlist.name
                       ? (isDark ? 'bg-neutral-800' : 'bg-neutral-200')
@@ -906,7 +941,13 @@ function App() {
               {/* Controls */}
               <div className={`px-4 py-3 flex items-center gap-3 ${isDark ? 'bg-gradient-to-b from-neutral-900/95 to-neutral-900' : 'bg-gradient-to-b from-neutral-100/95 to-neutral-100'}`}>
                 <button 
-                  onClick={() => selectedPlaylist.songs.length > 0 && playSong(selectedPlaylist.songs[0], 0)}
+                  onClick={() => {
+                    if (selectedPlaylist.songs.length > 0) {
+                      const startPosition = selectedPlaylist.position || 0
+                      const validPosition = startPosition >= 0 && startPosition < selectedPlaylist.songs.length ? startPosition : 0
+                      playSong(selectedPlaylist.songs[validPosition], validPosition)
+                    }
+                  }}
                   className="w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition-all shadow-lg"
                   style={{ backgroundColor: currentTheme.primary }}
                 >

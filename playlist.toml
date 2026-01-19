@@ -1,10 +1,18 @@
 name = "My Awesome Playlist"
 description = "A collection of my favorite songs"
+position = 0
 
 # Optional: Add a custom cover image for your playlist
 # Put the image file in your playlist folder and reference it here
 # cover = "cover.jpg"
 
+# Song positions (auto-generated when app starts)
+# filename = position
+[songs]
+"song1.mp3" = 1
+"song2.mp3" = 2
+"song3.mp3" = 3
+
 # That's it! Just put your MP3/audio files in the 'musics' folder
-# and everything else (title, artist, duration, cover art) will be 
-# automatically extracted from the file metadata!
+# Song positions will be auto-generated based on filename order
+# when the app starts if they don't exist!

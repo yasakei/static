@@ -8,6 +8,7 @@ export namespace main {
 	    duration: string;
 	    coverData?: string;
 	    durationSec?: number;
+	    position?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Song(source);
@@ -22,6 +23,7 @@ export namespace main {
 	        this.duration = source["duration"];
 	        this.coverData = source["coverData"];
 	        this.durationSec = source["durationSec"];
+	        this.position = source["position"];
 	    }
 	}
 	export class Playlist {
@@ -30,6 +32,7 @@ export namespace main {
 	    folderPath: string;
 	    songs: Song[];
 	    coverData?: string;
+	    position: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Playlist(source);
@@ -42,6 +45,7 @@ export namespace main {
 	        this.folderPath = source["folderPath"];
 	        this.songs = this.convertValues(source["songs"], Song);
 	        this.coverData = source["coverData"];
+	        this.position = source["position"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
