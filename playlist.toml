@@ -1,0 +1,10 @@
+name = "My Awesome Playlist"
+description = "A collection of my favorite songs"
+
+# Optional: Add a custom cover image for your playlist
+# Put the image file in your playlist folder and reference it here
+# cover = "cover.jpg"
+
+# That's it! Just put your MP3/audio files in the 'musics' folder
+# and everything else (title, artist, duration, cover art) will be 
+# automatically extracted from the file metadata!

@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  overflow: hidden;
+  background: #000000;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Modern slider */
+.modern-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.modern-slider::-webkit-slider-track {
+  background: #333;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.modern-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #fff;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modern-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+/* Smooth gradient transitions */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 10s ease infinite;
+}
