@@ -289,7 +289,7 @@ wails build -clean
 
 ## License
 
-[Add your license information here]
+Neutron Public License 1.0
 
 ## Support
 
