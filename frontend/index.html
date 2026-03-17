@@ -3,9 +3,52 @@
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Music Player</title>
+    <title>Static</title>
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #070A0F;
+        }
+
+        /* Pre-React boot splash (minimal) */
+        #boot {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #070A0F;
+        }
+
+        .boot-wordmark {
+            margin: 0;
+            font-family: "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Roboto, Arial, sans-serif;
+            font-weight: 600;
+            font-size: 28px;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.92);
+            text-transform: lowercase;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-variation-settings: "wght" 600;
+        }
+
+        /* Fade-out when React is ready */
+        #boot[data-state="done"] {
+            animation: boot-fade 220ms ease forwards;
+        }
+        @keyframes boot-fade {
+            to { opacity: 0; visibility: hidden; }
+        }
+    </style>
 </head>
 <body>
+<div id="boot" aria-label="Loading">
+    <div class="boot-wordmark">static.</div>
+</div>
 <div id="app"></div>
 <script src="./src/main.jsx" type="module"></script>
 </body>

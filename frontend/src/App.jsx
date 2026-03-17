@@ -1,31 +1,54 @@
 import { useState, useEffect, useRef } from 'react'
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Volume2, 
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
   Music,
   Settings,
   X,
   Sun,
   Moon,
   Heart,
-  ChevronLeft,
-  ChevronRight,
-  Cat
+  Cat,
+  Disc3,
+  ListMusic,
+  Shuffle,
+  Repeat,
+  Repeat1,
+  Mic2,
+  Sparkles,
+  Zap,
+  Radio,
+  Headphones,
+  Album,
+  Clock,
+  MoreHorizontal,
+  Plus,
+  Trash2,
+  Check
 } from 'lucide-react'
-import { GetPlaylists, GetSongFileURL, NotifyPlaybackState, UpdatePlaybackPosition, GetSettings, UpdateSettings, CheckFFmpegInstalled, ClearAudioCache, GetCacheInfo, UpdatePlaylistPosition, GetPlaylistPosition } from '../wailsjs/go/main/App'
-import { LogPrint as WailsLogPrint } from '../wailsjs/runtime/runtime'
+import { App as Backend } from "../bindings/static"
 
-// Fallback for development mode
 const LogPrint = (message) => {
-  if (typeof WailsLogPrint === 'function') {
-    WailsLogPrint(message)
-  } else {
-    console.log(`[LOG] ${message}`)
-  }
+  console.log(`[LOG] ${message}`)
 }
+
+const {
+  GetPlaylists,
+  GetSongFileURL,
+  NotifyPlaybackState,
+  UpdatePlaybackPosition,
+  GetSettings,
+  UpdateSettings,
+  CheckFFmpegInstalled,
+  ClearAudioCache,
+  GetCacheInfo,
+  UpdatePlaylistPosition,
+  GetPlaylistPosition,
+} = Backend
 
 function App() {
   const [playlists, setPlaylists] = useState([])
@@ -743,101 +766,110 @@ function App() {
   }
 
   if (loading) {
-    return (
-      <div className="h-screen bg-black text-green-400 font-mono flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-green-300 text-sm mb-4">
-            user@static:~$ initializing audio system...
-          </div>
-          <div className="flex items-center gap-2 text-green-400">
-            <span className="animate-pulse">Loading</span>
-            <span className="animate-pulse" style={{animationDelay: '0.2s'}}>.</span>
-            <span className="animate-pulse" style={{animationDelay: '0.4s'}}>.</span>
-            <span className="animate-pulse" style={{animationDelay: '0.6s'}}>.</span>
-          </div>
-          <div className="text-green-600 text-xs mt-2">
-            [████████████████████████████████] 100%
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (loading) {
     LogPrint('Rendering loading screen')
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 mx-auto mb-4 flex items-center justify-center animate-pulse">
-            <Music className="w-8 h-8 text-white" />
+      <div className="h-screen flex flex-col items-center justify-center bg-[#070A0F] text-white">
+        {/* Animated logo container */}
+        <div className="relative mb-8">
+          {/* Outer ring */}
+          <div 
+            className="w-24 h-24 rounded-full border-2 border-neutral-800 flex items-center justify-center relative"
+          >
+            {/* Spinning accent ring */}
+            <div 
+              className="absolute inset-0 rounded-full border-2 border-t-transparent animate-spin"
+              style={{ borderColor: `${currentTheme.primary} transparent ${currentTheme.primary} transparent` }}
+            ></div>
+            
+            {/* Inner disc */}
+            <div 
+              className="w-16 h-16 rounded-full flex items-center justify-center relative overflow-hidden"
+              style={{ backgroundColor: currentTheme.primary }}
+            >
+              {/* Rotating disc icon */}
+              <Disc3 className="w-8 h-8 text-white animate-spin" style={{ animationDuration: '3s' }} />
+              
+              {/* Subtle shine effect */}
+              <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-full blur-sm"></div>
+            </div>
           </div>
-          <div className="text-xl font-semibold">Loading...</div>
-          <div className="text-sm text-gray-400 mt-2">Scanning for playlists</div>
+          
+          {/* Orbiting dots */}
+          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-2 h-2 rounded-full bg-white"></div>
+          </div>
         </div>
-      </div>
-    )
-  }
-
-  // LogPrint(`Rendering main app - playlists: ${playlists.length}, selectedPlaylist: ${selectedPlaylist?.name || 'none'}`)
-
-  if (loading) {
-    return (
-      <div className="h-screen bg-black flex items-center justify-center">
+        
+        {/* App name */}
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-green-500 mx-auto mb-4 flex items-center justify-center animate-pulse">
-            <Music className="w-8 h-8 text-black" />
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
+            <span className="text-white">static</span>
+            <span style={{ color: currentTheme.primary }}>.</span>
+          </h1>
+          
+          {/* Loading indicator */}
+          <div className="flex items-center gap-1.5 justify-center">
+            <span className="text-sm text-neutral-500">Loading</span>
+            <div className="flex gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+            </div>
           </div>
-          <div className="text-white text-lg">Loading...</div>
+          
+          {/* Status text */}
+          <p className="text-xs text-neutral-600 mt-4">Preparing your music</p>
+        </div>
+        
+        {/* Bottom progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-neutral-900">
+          <div 
+            className="h-full animate-pulse"
+            style={{ 
+              width: '30%',
+              backgroundColor: currentTheme.primary,
+              animation: 'loading-pulse 1.5s ease-in-out infinite'
+            }}
+          ></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`h-screen flex flex-col overflow-hidden ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
+    <div className={`h-screen flex flex-col overflow-hidden ${isDark ? 'bg-[#070A0F] text-white' : 'bg-white text-black'}`}>
       <audio ref={audioRef} />
-      
+
       {/* Main Content */}
-      <div className="flex-1 flex gap-2 p-2 overflow-hidden">
+      <div className="flex-1 flex gap-3 p-3 overflow-hidden">
         {/* Left Sidebar */}
-        <div className={`w-64 rounded-lg p-6 flex flex-col gap-6 ${isDark ? 'bg-neutral-900' : 'bg-neutral-100'}`}>
+        <div className={`w-72 rounded-xl p-5 flex flex-col gap-6 border ${isDark ? 'bg-[#0F1115] border-[#1A1D23]' : 'bg-gray-50 border-gray-200'}`}>
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-2">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden group"
+          <div className="flex items-center gap-3">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden"
               style={{ backgroundColor: currentTheme.primary }}
             >
-              {/* Animated background gradient */}
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{
-                  background: `linear-gradient(45deg, ${currentTheme.primary}, ${currentTheme.primaryHover}, ${currentTheme.primary})`
-                }}
-              ></div>
-              
-              {/* Sparkle effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute top-1 left-2 w-1 h-1 bg-white rounded-full animate-pulse"></div>
-                <div className="absolute top-3 right-1 w-0.5 h-0.5 bg-white rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                <div className="absolute bottom-2 left-1 w-0.5 h-0.5 bg-white rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-              </div>
-              
-              <Music className="w-6 h-6 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" />
+              <Sparkles className="w-5 h-5 text-white/80 absolute top-1 right-1" />
+              <Disc3 className="w-6 h-6 text-white relative z-10" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent">
-              Static
-            </span>
+            <div>
+              <span className="text-lg font-bold tracking-tight">Static</span>
+              <div className={`text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Music Player</div>
+            </div>
           </div>
 
-          <div>
-            <h2 className={`text-base font-semibold mb-4 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>Your Library</h2>
-            <div className="space-y-2">
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <div className="flex items-center gap-2 mb-3">
+              <ListMusic className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
+              <h2 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Library</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto -mx-2 px-2 space-y-1">
               {playlists.map((playlist, index) => (
                 <div
                   key={index}
                   onClick={() => {
                     setSelectedPlaylist(playlist)
-                    // Set current song index to saved position
                     if (playlist.songs && playlist.songs.length > 0) {
                       const savedPosition = playlist.position || 0
                       if (savedPosition >= 0 && savedPosition < playlist.songs.length) {
@@ -848,99 +880,87 @@ function App() {
                       }
                     }
                   }}
-                  className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all group ${
                     selectedPlaylist?.name === playlist.name
-                      ? (isDark ? 'bg-neutral-800' : 'bg-neutral-200')
-                      : (isDark ? 'hover:bg-neutral-800' : 'hover:bg-neutral-200')
+                      ? (isDark ? 'bg-[#1A1D23]' : 'bg-gray-200')
+                      : (isDark ? 'hover:bg-[#15181E]' : 'hover:bg-gray-100')
                   }`}
                 >
                   {/* Playlist Artwork */}
-                  <div className={`w-12 h-12 rounded flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-neutral-800' : 'bg-neutral-300'}`}>
+                  <div className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-200'}`}>
                     {playlist.coverData ? (
-                      <img 
-                        src={playlist.coverData} 
-                        alt={playlist.name} 
-                        className="w-full h-full object-cover rounded" 
-                      />
+                      <img src={playlist.coverData} alt={playlist.name} className="w-full h-full object-cover" />
                     ) : playlist.songs[0]?.coverData ? (
-                      <img 
-                        src={playlist.songs[0].coverData} 
-                        alt={playlist.name} 
-                        className="w-full h-full object-cover rounded" 
-                      />
+                      <img src={playlist.songs[0].coverData} alt={playlist.name} className="w-full h-full object-cover" />
                     ) : (
-                      <Music className="w-6 h-6 text-neutral-600" />
+                      <ListMusic className={`w-5 h-5 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={`font-semibold text-sm truncate ${isDark ? 'text-white' : 'text-black'}`}>{playlist.name}</div>
-                    <div className={`text-xs ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>Playlist • {playlist.songs.length} songs</div>
+                    <div className={`font-medium text-sm truncate ${isDark ? 'text-white' : 'text-black'}`}>{playlist.name}</div>
+                    <div className={`text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{playlist.songs.length} songs</div>
                   </div>
+                  {selectedPlaylist?.name === playlist.name && (
+                    <Check className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
+                  )}
                 </div>
               ))}
             </div>
           </div>
-          
-          <button 
+
+          <button
             onClick={() => {
               LogPrint('Settings button clicked')
               setShowSettings(true)
-              // Load cache info when settings is opened
               if (!cacheInfo) {
                 loadCacheInfo()
               }
             }}
-            className={`mt-auto flex items-center gap-2 transition-colors ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'}`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors ${isDark ? 'text-neutral-400 hover:text-white hover:bg-[#1A1D23]' : 'text-neutral-600 hover:text-black hover:bg-gray-100'}`}
           >
             <Settings className="w-5 h-5" />
-            <span>Settings</span>
+            <span className="text-sm font-medium">Settings</span>
           </button>
         </div>
 
         {/* Main Content Area */}
-        <div className={`flex-1 rounded-lg overflow-hidden flex flex-col ${isDark ? 'bg-neutral-900' : 'bg-neutral-100'}`}>
+        <div className={`flex-1 rounded-xl overflow-hidden flex flex-col border ${isDark ? 'bg-[#0F1115] border-[#1A1D23]' : 'bg-white border-gray-200'}`}>
           {selectedPlaylist ? (
             <>
-              {/* Playlist Header with Gradient */}
-              <div 
-                className="relative p-4 transition-colors duration-1000"
-                style={{
-                  background: isDark 
-                    ? `linear-gradient(to bottom, ${dominantColor}, rgb(23, 23, 23))`
-                    : `linear-gradient(to bottom, ${dominantColor}, rgb(245, 245, 245))`
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-24 h-24 rounded shadow-xl flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-neutral-800' : 'bg-neutral-200'}`}>
+              {/* Playlist Header */}
+              <div className={`p-6 border-b ${isDark ? 'border-[#1A1D23]' : 'border-gray-100'}`}>
+                <div className="flex items-center gap-5">
+                  <div className={`w-32 h-32 rounded-xl shadow-2xl flex items-center justify-center flex-shrink-0 overflow-hidden ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
                     {selectedPlaylist.coverData ? (
-                      <img 
-                        src={selectedPlaylist.coverData} 
-                        alt={selectedPlaylist.name} 
-                        className="w-full h-full object-cover rounded" 
-                      />
+                      <img src={selectedPlaylist.coverData} alt={selectedPlaylist.name} className="w-full h-full object-cover" />
                     ) : selectedPlaylist.songs[0]?.coverData ? (
-                      <img 
-                        src={selectedPlaylist.songs[0].coverData} 
-                        alt={selectedPlaylist.name} 
-                        className="w-full h-full object-cover rounded" 
-                      />
+                      <img src={selectedPlaylist.songs[0].coverData} alt={selectedPlaylist.name} className="w-full h-full object-cover" />
                     ) : (
-                      <Music className={`w-10 h-10 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                      <Album className={`w-14 h-14 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={`text-xs font-bold mb-1 ${isDark ? 'text-white' : 'text-black'}`}>PLAYLIST</div>
-                    <h1 className={`text-2xl font-black mb-1 truncate ${isDark ? 'text-white' : 'text-black'}`}>{selectedPlaylist.name}</h1>
-                    <div className={`text-xs ${isDark ? 'text-white/80' : 'text-black/80'}`}>
-                      {selectedPlaylist.songs.length} songs
+                    <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Playlist</div>
+                    <h1 className={`text-4xl font-black mb-3 truncate ${isDark ? 'text-white' : 'text-black'}`}>{selectedPlaylist.name}</h1>
+                    <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                      <span className="flex items-center gap-1.5">
+                        <ListMusic className="w-4 h-4" />
+                        {selectedPlaylist.songs.length} songs
+                      </span>
+                      {selectedPlaylist.description && (
+                        <>
+                          <span>•</span>
+                          <span className="truncate">{selectedPlaylist.description}</span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Controls */}
-              <div className={`px-4 py-3 flex items-center gap-3 ${isDark ? 'bg-gradient-to-b from-neutral-900/95 to-neutral-900' : 'bg-gradient-to-b from-neutral-100/95 to-neutral-100'}`}>
-                <button 
+              <div className={`px-6 py-4 flex items-center gap-4 border-b ${isDark ? 'border-[#1A1D23] bg-[#0F1115]' : 'border-gray-100 bg-white'}`}>
+                <button
                   onClick={() => {
                     if (selectedPlaylist.songs.length > 0) {
                       const startPosition = selectedPlaylist.position || 0
@@ -948,28 +968,40 @@ function App() {
                       playSong(selectedPlaylist.songs[validPosition], validPosition)
                     }
                   }}
-                  className="w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition-all shadow-lg"
+                  className="w-12 h-12 rounded-full flex items-center justify-center hover:scale-105 transition-all shadow-lg"
                   style={{ backgroundColor: currentTheme.primary }}
                 >
-                  <Play className="w-5 h-5 text-white ml-0.5" />
+                  {isPlaying && currentSong ? (
+                    <Pause className="w-6 h-6 text-white" />
+                  ) : (
+                    <Play className="w-6 h-6 text-white ml-0.5" />
+                  )}
                 </button>
-                <button 
+                
+                <button
                   onClick={() => togglePlaylistNightcore(selectedPlaylist)}
                   className={`transition-all duration-200 ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'}`}
                   title="Toggle Nightcore Mode for Playlist"
                 >
                   {isProcessingNightcore ? (
-                    <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
-                      selectedPlaylist.nightcoreMode 
-                        ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-lg transform scale-110 hover:scale-105' 
-                        : 'border-2 border-current hover:bg-current/10 hover:scale-105'
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                      selectedPlaylist.nightcoreMode
+                        ? 'text-pink-500 bg-pink-500/10 hover:bg-pink-500/20'
+                        : 'hover:bg-neutral-500/10'
                     }`}>
                       <Cat className="w-5 h-5" />
                     </div>
                   )}
                 </button>
+
+                <div className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-lg ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
+                  <Zap className={`w-4 h-4 ${selectedPlaylist.nightcoreMode ? 'text-pink-500' : (isDark ? 'text-neutral-500' : 'text-neutral-400')}`} />
+                  <span className={`text-sm font-medium ${selectedPlaylist.nightcoreMode ? 'text-pink-500' : (isDark ? 'text-neutral-400' : 'text-neutral-500')}`}>
+                    {selectedPlaylist.nightcoreMode ? 'Nightcore Mode Active' : 'Nightcore Mode Off'}
+                  </span>
+                </div>
               </div>
 
               {/* Nightcore Progress Bar */}
@@ -996,41 +1028,47 @@ function App() {
               )}
 
               {/* Song List */}
-              <div className="flex-1 overflow-y-auto px-4 pb-4">
-                <div className={`grid grid-cols-[16px_4fr_2fr_minmax(120px,1fr)] gap-4 px-4 py-2 text-sm border-b sticky top-0 ${
-                  isDark 
-                    ? 'text-neutral-400 border-neutral-800 bg-neutral-900' 
-                    : 'text-neutral-600 border-neutral-300 bg-neutral-100'
+              <div className="flex-1 overflow-y-auto">
+                <div className={`grid grid-cols-[auto_1fr_1fr_auto] gap-4 px-6 py-3 text-xs font-bold uppercase tracking-wider border-b sticky top-0 ${
+                  isDark
+                    ? 'text-neutral-500 border-[#1A1D23] bg-[#0F1115]'
+                    : 'text-neutral-500 border-gray-100 bg-white'
                 }`}>
-                  <div>#</div>
-                  <div>TITLE</div>
-                  <div>ALBUM</div>
-                  <div className="text-right">⏱</div>
+                  <div className="w-8 text-center">#</div>
+                  <div>Title</div>
+                  <div>Album</div>
+                  <div className="pr-8"><Clock className="w-4 h-4 ml-auto" /></div>
                 </div>
-                
+
                 {selectedPlaylist.songs.map((song, index) => (
                   <div
                     key={index}
                     onClick={() => playSong(song, index)}
-                    className={`grid grid-cols-[16px_4fr_2fr_minmax(120px,1fr)] gap-4 px-4 py-3 rounded-md cursor-pointer group ${
+                    className={`grid grid-cols-[auto_1fr_1fr_auto] gap-4 px-6 py-3 mx-4 rounded-lg cursor-pointer group transition-all ${
                       currentSong?.title === song.title
-                        ? (isDark ? 'bg-neutral-800' : 'bg-neutral-200')
-                        : (isDark ? 'hover:bg-neutral-800' : 'hover:bg-neutral-200')
+                        ? (isDark ? 'bg-[#1A1D23]' : 'bg-gray-100')
+                        : (isDark ? 'hover:bg-[#15181E]' : 'hover:bg-gray-50')
                     }`}
                   >
-                    <div className={`flex items-center justify-center ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                    <div className={`flex items-center justify-center w-8 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`}>
                       {currentSong?.title === song.title && isPlaying ? (
-                        <span className="text-green-500">♪</span>
+                        <div className="flex items-center gap-0.5">
+                          <span className="w-1 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                          <span className="w-1 h-4 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></span>
+                          <span className="w-1 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></span>
+                        </div>
                       ) : (
-                        <span className="group-hover:hidden">{index + 1}</span>
+                        <>
+                          <span className="group-hover:hidden font-medium">{index + 1}</span>
+                          <Play className={`w-4 h-4 hidden group-hover:block ${isDark ? 'text-white' : 'text-black'}`} />
+                        </>
                       )}
-                      <Play className={`w-4 h-4 hidden group-hover:block ${isDark ? 'text-white' : 'text-black'}`} />
                     </div>
-                    
+
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-10 h-10 rounded flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-neutral-800' : 'bg-neutral-200'}`}>
+                      <div className={`w-11 h-11 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
                         {song.coverData ? (
-                          <img src={song.coverData} alt={song.title} className="w-full h-full object-cover rounded" />
+                          <img src={song.coverData} alt={song.title} className="w-full h-full object-cover" />
                         ) : (
                           <Music className={`w-5 h-5 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
                         )}
@@ -1039,15 +1077,15 @@ function App() {
                         <div className={`font-medium truncate ${currentSong?.title === song.title ? 'text-green-500' : (isDark ? 'text-white' : 'text-black')}`}>
                           {song.title}
                         </div>
-                        <div className={`text-sm truncate ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>{song.artist}</div>
+                        <div className={`text-sm truncate ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{song.artist}</div>
                       </div>
                     </div>
-                    
-                    <div className={`flex items-center text-sm truncate ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+
+                    <div className={`flex items-center text-sm truncate ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>
                       {selectedPlaylist.name}
                     </div>
-                    
-                    <div className={`flex items-center justify-end text-sm ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+
+                    <div className={`flex items-center justify-end text-sm font-mono ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>
                       {song.duration}
                     </div>
                   </div>
@@ -1057,8 +1095,11 @@ function App() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <Music className={`w-20 h-20 mx-auto mb-4 ${isDark ? 'text-neutral-700' : 'text-neutral-300'}`} />
-                <p className={`text-xl ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>Select a playlist</p>
+                <div className={`w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
+                  <Radio className={`w-10 h-10 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                </div>
+                <p className={`text-lg font-medium ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Select a playlist</p>
+                <p className={`text-sm mt-1 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`}>Choose from your library to start playing</p>
               </div>
             </div>
           )}
@@ -1067,70 +1108,73 @@ function App() {
 
       {/* Bottom Player Bar */}
       {currentSong && (
-        <div className={`h-24 border-t px-4 flex items-center gap-4 ${
-          isDark 
-            ? 'bg-black border-neutral-900' 
-            : 'bg-white border-neutral-200'
+        <div className={`h-20 border-t px-4 flex items-center gap-4 ${
+          isDark
+            ? 'bg-[#0F1115] border-[#1A1D23]'
+            : 'bg-white border-gray-200'
         }`}>
           {/* Song Info */}
-          <div className="w-80 flex items-center gap-3">
-            <div className={`w-14 h-14 rounded flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-neutral-800' : 'bg-neutral-200'}`}>
+          <div className="w-72 flex items-center gap-3">
+            <div className={`w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden shadow-lg ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
               {currentSong.coverData ? (
-                <img src={currentSong.coverData} alt={currentSong.title} className="w-full h-full object-cover rounded" />
+                <img src={currentSong.coverData} alt={currentSong.title} className="w-full h-full object-cover" />
               ) : (
                 <Music className={`w-6 h-6 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
               )}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className={`font-medium text-sm truncate ${isDark ? 'text-white' : 'text-black'}`}>{currentSong.title}</div>
-              <div className={`text-xs truncate ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>{currentSong.artist}</div>
+              <div className={`text-xs truncate ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{currentSong.artist}</div>
             </div>
-            <button className={`ml-2 transition-colors ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'}`}>
+            <button className={`transition-colors ${isDark ? 'text-neutral-500 hover:text-red-500' : 'text-neutral-400 hover:text-red-500'}`}>
               <Heart className="w-5 h-5" />
             </button>
           </div>
 
           {/* Controls */}
           <div className="flex-1 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-4">
-              <button onClick={previousSong} className={`transition-colors ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'}`}>
+            <div className="flex items-center gap-3">
+              <button onClick={previousSong} className={`transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
                 <SkipBack className="w-5 h-5" />
               </button>
-              <button 
-                onClick={togglePlayPause} 
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
+              <button
+                onClick={togglePlayPause}
+                className="w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
+                style={{ backgroundColor: currentTheme.primary }}
               >
-                {isPlaying ? <Pause className="w-5 h-5 text-black" /> : <Play className="w-5 h-5 text-black ml-0.5" />}
+                {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white ml-0.5" />}
               </button>
-              <button onClick={nextSong} className={`transition-colors ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'}`}>
+              <button onClick={nextSong} className={`transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
                 <SkipForward className="w-5 h-5" />
               </button>
             </div>
-            
-            <div className="flex items-center gap-2 w-full max-w-2xl">
-              <span className={`text-xs w-10 text-right ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>{formatTime(currentTime)}</span>
-              <div 
-                className={`flex-1 h-1 rounded-full cursor-pointer group ${isDark ? 'bg-neutral-700' : 'bg-neutral-300'}`}
+
+            <div className="flex items-center gap-3 w-full max-w-2xl">
+              <span className={`text-xs w-10 text-right font-mono ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{formatTime(currentTime)}</span>
+              <div
+                className={`flex-1 h-1.5 rounded-full cursor-pointer group ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-200'}`}
                 onClick={seekTo}
               >
-                <div 
-                  className="h-full bg-white rounded-full relative"
-                  style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
+                <div
+                  className="h-full rounded-full relative transition-all"
+                  style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%`, backgroundColor: currentTheme.primary }}
                 >
-                  <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg"></div>
                 </div>
               </div>
-              <span className={`text-xs w-10 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>{formatTime(duration)}</span>
+              <span className={`text-xs w-10 font-mono ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{formatTime(duration)}</span>
             </div>
           </div>
 
           {/* Volume */}
           <div className="w-32 flex items-center gap-2">
-            <Volume2 className={`w-5 h-5 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`} />
-            <div className={`flex-1 h-1 rounded-full relative group ${isDark ? 'bg-neutral-700' : 'bg-neutral-300'}`}>
-              <div 
-                className="h-full bg-white rounded-full"
-                style={{ width: `${volume * 100}%` }}
+            <button onClick={() => setVolume(volume === 0 ? 0.7 : 0)} className={`${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
+              {volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+            <div className={`flex-1 h-1.5 rounded-full relative group ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-200'}`}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${volume * 100}%`, backgroundColor: currentTheme.primary }}
               ></div>
               <input
                 type="range"
@@ -1148,47 +1192,55 @@ function App() {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-          <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-2xl p-8 w-[500px] max-h-[80vh] overflow-y-auto shadow-2xl border border-neutral-700">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className={`rounded-2xl p-8 w-[520px] max-h-[85vh] overflow-y-auto shadow-2xl border ${isDark ? 'bg-[#0F1115] border-[#1A1D23]' : 'bg-white border-gray-200'}`}>
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-3xl font-bold text-white">Settings</h3>
-              <button 
-                onClick={() => setShowSettings(false)} 
-                className="text-neutral-400 hover:text-white transition-colors p-2 hover:bg-neutral-700 rounded-lg"
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
+                  <Settings className={`w-5 h-5 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`} />
+                </div>
+                <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Settings</h3>
+              </div>
+              <button
+                onClick={() => setShowSettings(false)}
+                className={`transition-colors p-2 rounded-lg ${isDark ? 'text-neutral-500 hover:text-white hover:bg-[#1A1D23]' : 'text-neutral-400 hover:text-black hover:bg-gray-100'}`}
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-            
-            <div className="space-y-8">
+
+            <div className="space-y-6">
               {/* Theme */}
               <div>
-                <label className="block text-lg font-semibold mb-4 text-white">Appearance</label>
-                
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
+                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Appearance</label>
+                </div>
+
                 {/* Dark/Light Mode */}
-                <div className="mb-6">
-                  <div className="text-sm text-neutral-300 mb-3">Theme Mode</div>
-                  <div className="flex gap-3">
+                <div className="mb-5">
+                  <div className={`text-sm mb-3 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Theme Mode</div>
+                  <div className="flex gap-2">
                     <button
                       onClick={() => saveTheme('dark')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
-                        isDark 
-                          ? 'text-white shadow-lg' 
-                          : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                      className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border ${
+                        isDark
+                          ? 'text-white shadow-lg'
+                          : 'bg-gray-50 text-neutral-600 hover:bg-gray-100 border-gray-200'
                       }`}
-                      style={isDark ? { backgroundColor: currentTheme.primary } : {}}
+                      style={isDark ? { backgroundColor: currentTheme.primary, borderColor: currentTheme.primary } : {}}
                     >
                       <Moon className="w-4 h-4" />
                       Dark
                     </button>
                     <button
                       onClick={() => saveTheme('light')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
-                        !isDark 
-                          ? 'text-white shadow-lg' 
-                          : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                      className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border ${
+                        !isDark
+                          ? 'text-white shadow-lg'
+                          : 'bg-gray-50 text-neutral-600 hover:bg-gray-100 border-gray-200'
                       }`}
-                      style={!isDark ? { backgroundColor: currentTheme.primary } : {}}
+                      style={!isDark ? { backgroundColor: currentTheme.primary, borderColor: currentTheme.primary } : {}}
                     >
                       <Sun className="w-4 h-4" />
                       Light
@@ -1198,19 +1250,19 @@ function App() {
 
                 {/* Accent Colors */}
                 <div>
-                  <div className="text-sm text-neutral-300 mb-3">Accent Color</div>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className={`text-sm mb-3 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Accent Color</div>
+                  <div className="grid grid-cols-4 gap-2">
                     {Object.entries(colorThemes).map(([color, theme]) => (
                       <button
                         key={color}
                         onClick={() => setAccentColor(color)}
-                        className={`aspect-square rounded-xl transition-all ${
-                          accentColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-neutral-800' : 'hover:scale-105'
+                        className={`aspect-square rounded-xl transition-all border-2 ${
+                          accentColor === color ? 'border-white scale-105' : 'border-transparent hover:scale-105'
                         }`}
                         style={{ backgroundColor: theme.primary }}
                       >
                         <div className="w-full h-full rounded-xl flex items-center justify-center">
-                          <div className="w-4 h-4 bg-white/20 rounded-full"></div>
+                          {accentColor === color && <Check className="w-5 h-5 text-white" />}
                         </div>
                       </button>
                     ))}
@@ -1220,87 +1272,99 @@ function App() {
 
               {/* Audio Effects */}
               <div>
-                <label className="block text-lg font-semibold mb-4 text-white">Audio Effects</label>
-                
+                <div className="flex items-center gap-2 mb-4">
+                  <Headphones className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
+                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Audio Effects</label>
+                </div>
+
                 {!ffmpegAvailable && (
-                  <div className="mb-4 p-4 bg-yellow-900/30 border border-yellow-600/50 rounded-xl">
-                    <div className="text-yellow-300 text-sm font-medium">FFmpeg Required</div>
-                    <div className="text-yellow-200/80 text-xs mt-1">
+                  <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
+                    <div className="text-yellow-500 text-sm font-medium flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      FFmpeg Required
+                    </div>
+                    <div className="text-yellow-500/70 text-xs mt-1">
                       Install FFmpeg to enable audio effects. Visit ffmpeg.org for installation instructions.
                     </div>
                   </div>
                 )}
-                
+
                 {/* Crossfade */}
-                <div className="flex items-center justify-between p-4 bg-neutral-800/50 rounded-xl mb-4 border border-neutral-700">
+                <div className={`flex items-center justify-between p-4 rounded-xl mb-3 border ${isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200'}`}>
                   <div>
-                    <div className="font-medium text-white">Crossfade</div>
-                    <div className="text-xs text-neutral-400">Smooth transitions between songs</div>
+                    <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>Crossfade</div>
+                    <div className={`text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Smooth transitions between songs</div>
                   </div>
                   <button
                     onClick={() => setCrossfadeEnabled(!crossfadeEnabled)}
-                    className={`w-14 h-7 rounded-full transition-all relative ${
-                      crossfadeEnabled ? 'shadow-lg' : 'bg-neutral-600'
+                    className={`w-12 h-6 rounded-full transition-all relative ${
+                      crossfadeEnabled ? 'shadow-lg' : (isDark ? 'bg-[#252830]' : 'bg-gray-300')
                     }`}
                     style={crossfadeEnabled ? { backgroundColor: currentTheme.primary } : {}}
                   >
-                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
-                      crossfadeEnabled ? 'translate-x-8' : 'translate-x-1'
+                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                      crossfadeEnabled ? 'translate-x-6' : 'translate-x-0.5'
                     }`}></div>
                   </button>
                 </div>
 
                 {/* Bass Boost */}
-                <div className={`flex items-center justify-between p-4 rounded-xl mb-4 border ${
-                  ffmpegAvailable ? 'bg-neutral-800/50 border-neutral-700' : 'bg-neutral-800/20 border-neutral-700/50'
+                <div className={`flex items-center justify-between p-4 rounded-xl border ${
+                  ffmpegAvailable 
+                    ? (isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200') 
+                    : (isDark ? 'bg-[#1A1D23]/50 border-[#252830]/50' : 'bg-gray-50 border-gray-200')
                 }`}>
                   <div>
-                    <div className={`font-medium ${ffmpegAvailable ? 'text-white' : 'text-neutral-500'}`}>Bass Boost</div>
-                    <div className="text-xs text-neutral-400">Enhanced low frequencies (+10dB @ 200Hz)</div>
+                    <div className={`font-medium ${ffmpegAvailable ? (isDark ? 'text-white' : 'text-black') : (isDark ? 'text-neutral-600' : 'text-neutral-400')}`}>Bass Boost</div>
+                    <div className={`text-xs ${ffmpegAvailable ? (isDark ? 'text-neutral-500' : 'text-neutral-500') : (isDark ? 'text-neutral-600' : 'text-neutral-400')}`}>Enhanced low frequencies (+10dB @ 200Hz)</div>
                   </div>
                   <button
                     onClick={() => ffmpegAvailable && setBassBoostEnabled(!bassBoostEnabled)}
                     disabled={!ffmpegAvailable}
-                    className={`w-14 h-7 rounded-full transition-all relative ${
-                      bassBoostEnabled && ffmpegAvailable ? 'shadow-lg' : 'bg-neutral-600'
+                    className={`w-12 h-6 rounded-full transition-all relative ${
+                      bassBoostEnabled && ffmpegAvailable ? 'shadow-lg' : (isDark ? 'bg-[#252830]' : 'bg-gray-300')
                     } ${!ffmpegAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
                     style={bassBoostEnabled && ffmpegAvailable ? { backgroundColor: currentTheme.primary } : {}}
                   >
-                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
-                      bassBoostEnabled && ffmpegAvailable ? 'translate-x-8' : 'translate-x-1'
+                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                      bassBoostEnabled && ffmpegAvailable ? 'translate-x-6' : 'translate-x-0.5'
                     }`}></div>
                   </button>
                 </div>
               </div>
 
-              {/* Cache Management */}
+              {/* Storage */}
               <div>
-                <label className="block text-lg font-semibold mb-4 text-white">Storage</label>
-                
-                <div className="p-4 bg-neutral-800/50 rounded-xl border border-neutral-700">
+                <div className="flex items-center gap-2 mb-4">
+                  <Disc3 className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
+                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Storage</label>
+                </div>
+
+                <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200'}`}>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium text-white">Audio Effects Cache</div>
+                    <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>Audio Effects Cache</div>
                     <button
                       onClick={clearCache}
                       disabled={!cacheInfo}
-                      className={`px-4 py-2 text-white text-sm rounded-lg transition-all font-medium ${
-                        cacheInfo ? 'bg-red-600 hover:bg-red-700 shadow-sm' : 'bg-gray-600 cursor-not-allowed opacity-50'
+                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                        cacheInfo 
+                          ? 'bg-red-500 hover:bg-red-600 text-white' 
+                          : (isDark ? 'bg-[#252830] text-neutral-500' : 'bg-gray-200 text-neutral-400') + ' cursor-not-allowed'
                       }`}
                     >
                       Clear Cache
                     </button>
                   </div>
-                  <div className="text-sm text-neutral-400">
+                  <div className={`text-sm ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
                     {cacheInfo ? (
                       cacheInfo.exists ? (
-                        <>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span>{cacheInfo.fileCount} files</span>
-                            <span>•</span>
-                            <span>{cacheInfo.sizeMB.toFixed(2)} MB</span>
-                          </div>
-                          <div className="text-xs text-neutral-500 font-mono">{cacheInfo.path}</div>
-                        </>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-mono text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{cacheInfo.path}</span>
+                          <span>•</span>
+                          <span>{cacheInfo.fileCount} files</span>
+                          <span>•</span>
+                          <span>{cacheInfo.sizeMB.toFixed(2)} MB</span>
+                        </div>
                       ) : (
                         'No cache files found'
                       )
@@ -1311,21 +1375,25 @@ function App() {
                 </div>
               </div>
 
-              {/* Debug Section */}
+              {/* Debug */}
               <div>
-                <label className="block text-lg font-semibold mb-4 text-white">Debug</label>
-                
-                <div className="p-4 bg-neutral-800/50 rounded-xl border border-neutral-700">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium text-white">Cover Art Server</div>
+                <div className="flex items-center gap-2 mb-4">
+                  <MoreHorizontal className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
+                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Debug</label>
+                </div>
+
+                <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>Cover Art Server</div>
+                      <div className={`text-xs mt-0.5 ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Test the local cover art server</div>
+                    </div>
                     <button
                       onClick={async () => {
                         try {
-                          const { GetCoverServerInfo } = await import('../wailsjs/go/main/App')
-                          const info = await GetCoverServerInfo()
+                          const info = await Backend.GetCoverServerInfo()
                           LogPrint(`Cover Server Info: ${JSON.stringify(info, null, 2)}`)
-                          
-                          // Test the server
+
                           if (info.testURL) {
                             fetch(info.testURL)
                               .then(response => response.text())
@@ -1336,13 +1404,10 @@ function App() {
                           LogPrint(`Debug error: ${err.message}`)
                         }
                       }}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-all font-medium"
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-all"
                     >
                       Test Server
                     </button>
-                  </div>
-                  <div className="text-sm text-neutral-400">
-                    Test the local cover art server and check Discord RPC status
                   </div>
                 </div>
               </div>

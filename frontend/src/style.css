@@ -4,7 +4,7 @@
 
 * {
   box-sizing: border-box;
-  user-select: none; /* Make everything unselectable */
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -12,27 +12,39 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   overflow: hidden;
-  background: #000000;
+  background: #070A0F;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Modern and minimal */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 3px;
+  background: #2a2a2a;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: #3a3a3a;
+}
+
+/* Light theme scrollbar */
+.light ::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 /* Modern slider */
@@ -44,7 +56,7 @@ body {
 }
 
 .modern-slider::-webkit-slider-track {
-  background: #333;
+  background: #1a1a1a;
   height: 4px;
   border-radius: 2px;
 }
@@ -57,27 +69,91 @@ body {
   width: 12px;
   border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-.modern-slider:hover::-webkit-slider-thumb {
-  transform: scale(1.1);
+.modern-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
-/* Smooth gradient transitions */
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
+.modern-slider::-moz-range-track {
+  background: #1a1a1a;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.modern-slider::-moz-range-thumb {
+  background: #fff;
+  height: 12px;
+  width: 12px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.modern-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Smooth animations */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Disable transitions on specific elements for better performance */
+.no-transition {
+  transition: none !important;
+}
+
+/* Custom focus styles */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Glass effect for modals */
+.glass {
+  background: rgba(15, 17, 21, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Animation for playing indicator */
+@keyframes audio-wave {
+  0%, 100% {
+    height: 4px;
   }
   50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
+    height: 16px;
   }
 }
 
-.animated-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 10s ease infinite;
+.audio-wave-bar {
+  animation: audio-wave 0.8s ease-in-out infinite;
+}
+
+.audio-wave-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.audio-wave-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Loading screen pulse animation */
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scaleX(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
