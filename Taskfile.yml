@@ -1,0 +1,39 @@
+version: '3'
+
+includes:
+  common: build/Taskfile.yml
+  linux: build/linux/Taskfile.yml
+
+vars:
+  APP_NAME: static
+  BIN_DIR: bin
+  VITE_PORT: '{{.VITE_PORT | default "9245"}}'
+
+tasks:
+  build:
+    summary: Builds the application
+    cmds:
+      - task: linux:build
+        vars:
+          DEV: '{{.DEV}}'
+
+  run:
+    summary: Runs the application
+    cmds:
+      - task: linux:run
+
+  dev:frontend:
+    summary: Runs the frontend in dev mode
+    cmds:
+      - task: common:dev:frontend
+        vars:
+          VITE_PORT: '{{.VITE_PORT}}'
+
+  package:
+    summary: Packages the application
+    cmds:
+      - task: linux:package
+
+  default:
+    cmds:
+      - task: build

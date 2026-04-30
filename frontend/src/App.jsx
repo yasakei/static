@@ -765,158 +765,151 @@ function App() {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
+  // ─── M3 Expressive helpers ───────────────────────────────────────────────
+  const p = currentTheme.primary          // accent shorthand
+  const pAlpha = (a) => `${p}${Math.round(a*255).toString(16).padStart(2,'0')}`
+
+  // M3 Expressive surface tokens
+  const surf   = isDark ? '#1a1c1e' : '#f6f4ff'   // base surface
+  const surf1  = isDark ? '#1f2123' : '#edeaff'   // surface container low
+  const surf2  = isDark ? '#2a2d30' : '#e4e0f8'   // surface container
+  const surf3  = isDark ? '#35383b' : '#d9d5f2'   // surface container high
+  const onSurf = isDark ? '#e3e2e6' : '#1c1a2e'   // on-surface
+  const onSurfVar = isDark ? '#c7c6ca' : '#48455e' // on-surface variant
+  const outline   = isDark ? '#3a3d40' : '#c4c0db' // outline
+
   if (loading) {
     LogPrint('Rendering loading screen')
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-[#070A0F] text-white">
-        {/* Animated logo container */}
-        <div className="relative mb-8">
-          {/* Outer ring */}
-          <div 
-            className="w-24 h-24 rounded-full border-2 border-neutral-800 flex items-center justify-center relative"
+      <div className="h-screen flex flex-col" style={{ background: surf }}>
+        {/* top bar — app name flush left, very M3 */}
+        <div className="px-10 pt-10">
+          <span className="text-sm font-semibold tracking-widest uppercase" style={{ color: p }}>Static</span>
+        </div>
+
+        {/* center — big display wordmark + icon pill */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-8">
+          {/* icon pill — tonal container, no glow */}
+          <div
+            className="w-20 h-20 rounded-[2rem] flex items-center justify-center"
+            style={{ background: `${p}22` }}
           >
-            {/* Spinning accent ring */}
-            <div 
-              className="absolute inset-0 rounded-full border-2 border-t-transparent animate-spin"
-              style={{ borderColor: `${currentTheme.primary} transparent ${currentTheme.primary} transparent` }}
-            ></div>
-            
-            {/* Inner disc */}
-            <div 
-              className="w-16 h-16 rounded-full flex items-center justify-center relative overflow-hidden"
-              style={{ backgroundColor: currentTheme.primary }}
+            <Disc3 className="w-9 h-9" style={{ color: p }} />
+          </div>
+
+          {/* display text — the M3 Expressive signature */}
+          <div className="text-center">
+            <h1
+              className="font-black leading-none tracking-tight"
+              style={{ fontSize: '5rem', color: onSurf }}
             >
-              {/* Rotating disc icon */}
-              <Disc3 className="w-8 h-8 text-white animate-spin" style={{ animationDuration: '3s' }} />
-              
-              {/* Subtle shine effect */}
-              <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-full blur-sm"></div>
-            </div>
+              static
+            </h1>
+            <p className="mt-3 text-base font-medium" style={{ color: onSurfVar }}>
+              Music Player
+            </p>
           </div>
-          
-          {/* Orbiting dots */}
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-2 h-2 rounded-full bg-white"></div>
+
+          {/* M3 linear progress — thin, full-width-ish, no rounded caps on track */}
+          <div className="w-56 overflow-hidden" style={{ height: '3px', background: surf2, borderRadius: '99px' }}>
+            <div
+              className="h-full"
+              style={{
+                background: p,
+                borderRadius: '99px',
+                width: '40%',
+                animation: 'loading-slide 1.4s ease-in-out infinite',
+              }}
+            />
           </div>
         </div>
-        
-        {/* App name */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">
-            <span className="text-white">static</span>
-            <span style={{ color: currentTheme.primary }}>.</span>
-          </h1>
-          
-          {/* Loading indicator */}
-          <div className="flex items-center gap-1.5 justify-center">
-            <span className="text-sm text-neutral-500">Loading</span>
-            <div className="flex gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 animate-bounce" style={{ animationDelay: '0ms' }}></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 animate-bounce" style={{ animationDelay: '150ms' }}></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 animate-bounce" style={{ animationDelay: '300ms' }}></span>
-            </div>
-          </div>
-          
-          {/* Status text */}
-          <p className="text-xs text-neutral-600 mt-4">Preparing your music</p>
+
+        {/* bottom label */}
+        <div className="px-10 pb-10 text-right">
+          <span className="text-xs font-medium" style={{ color: onSurfVar }}>Loading your library</span>
         </div>
-        
-        {/* Bottom progress bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-neutral-900">
-          <div 
-            className="h-full animate-pulse"
-            style={{ 
-              width: '30%',
-              backgroundColor: currentTheme.primary,
-              animation: 'loading-pulse 1.5s ease-in-out infinite'
-            }}
-          ></div>
-        </div>
+
+        <style>{`
+          @keyframes loading-slide {
+            0%   { transform: translateX(-100%); width: 40%; }
+            50%  { width: 60%; }
+            100% { transform: translateX(350%); width: 40%; }
+          }
+        `}</style>
       </div>
     )
   }
 
   return (
-    <div className={`h-screen flex flex-col overflow-hidden ${isDark ? 'bg-[#070A0F] text-white' : 'bg-white text-black'}`}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: surf, color: onSurf }}>
       <audio ref={audioRef} />
 
-      {/* Main Content */}
-      <div className="flex-1 flex gap-3 p-3 overflow-hidden">
-        {/* Left Sidebar */}
-        <div className={`w-72 rounded-xl p-5 flex flex-col gap-6 border ${isDark ? 'bg-[#0F1115] border-[#1A1D23]' : 'bg-gray-50 border-gray-200'}`}>
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden"
-              style={{ backgroundColor: currentTheme.primary }}
-            >
-              <Sparkles className="w-5 h-5 text-white/80 absolute top-1 right-1" />
-              <Disc3 className="w-6 h-6 text-white relative z-10" />
-            </div>
-            <div>
-              <span className="text-lg font-bold tracking-tight">Static</span>
-              <div className={`text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Music Player</div>
-            </div>
+      {/* ── Layout ─────────────────────────────────────────────────────── */}
+      <div className="flex-1 flex overflow-hidden">
+
+        {/* ── Navigation Rail ─────────────────────────────────────────── */}
+        <div className="w-60 flex flex-col py-6 px-4 flex-shrink-0" style={{ background: surf }}>
+
+          {/* Wordmark */}
+          <div className="px-2 mb-8">
+            <h1 className="text-xl font-black tracking-tight" style={{ color: onSurf }}>
+              static<span style={{ color: p }}>.</span>
+            </h1>
+            <p className="text-[10px] font-medium mt-0.5 uppercase tracking-wider" style={{ color: onSurfVar }}>Music Player</p>
           </div>
 
-          <div className="flex-1 overflow-hidden flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <ListMusic className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
-              <h2 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Library</h2>
-            </div>
-            <div className="flex-1 overflow-y-auto -mx-2 px-2 space-y-1">
-              {playlists.map((playlist, index) => (
+          {/* Library label */}
+          <div className="px-2 mb-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: onSurfVar }}>Library</span>
+          </div>
+
+          {/* Playlist list */}
+          <div className="flex-1 overflow-y-auto space-y-1">
+            {playlists.map((playlist, index) => {
+              const active = selectedPlaylist?.name === playlist.name
+              return (
                 <div
                   key={index}
                   onClick={() => {
                     setSelectedPlaylist(playlist)
-                    if (playlist.songs && playlist.songs.length > 0) {
-                      const savedPosition = playlist.position || 0
-                      if (savedPosition >= 0 && savedPosition < playlist.songs.length) {
-                        setCurrentSongIndex(savedPosition)
-                        LogPrint(`Loaded saved position for ${playlist.name}: ${savedPosition}`)
-                      } else {
-                        setCurrentSongIndex(0)
-                      }
+                    if (playlist.songs?.length > 0) {
+                      const pos = playlist.position || 0
+                      setCurrentSongIndex(pos >= 0 && pos < playlist.songs.length ? pos : 0)
                     }
                   }}
-                  className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all group ${
-                    selectedPlaylist?.name === playlist.name
-                      ? (isDark ? 'bg-[#1A1D23]' : 'bg-gray-200')
-                      : (isDark ? 'hover:bg-[#15181E]' : 'hover:bg-gray-100')
-                  }`}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all"
+                  style={{
+                    background: active ? surf2 : 'transparent',
+                  }}
+                  onMouseEnter={e => { if (!active) e.currentTarget.style.background = surf1 }}
+                  onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
                 >
-                  {/* Playlist Artwork */}
-                  <div className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-200'}`}>
+                  <div className="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden flex items-center justify-center"
+                    style={{ background: surf2 }}>
                     {playlist.coverData ? (
                       <img src={playlist.coverData} alt={playlist.name} className="w-full h-full object-cover" />
                     ) : playlist.songs[0]?.coverData ? (
                       <img src={playlist.songs[0].coverData} alt={playlist.name} className="w-full h-full object-cover" />
                     ) : (
-                      <ListMusic className={`w-5 h-5 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                      <ListMusic className="w-4 h-4" style={{ color: onSurfVar }} />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className={`font-medium text-sm truncate ${isDark ? 'text-white' : 'text-black'}`}>{playlist.name}</div>
-                    <div className={`text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{playlist.songs.length} songs</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold truncate" style={{ color: active ? p : onSurf }}>{playlist.name}</div>
+                    <div className="text-xs truncate" style={{ color: onSurfVar }}>{playlist.songs.length} songs</div>
                   </div>
-                  {selectedPlaylist?.name === playlist.name && (
-                    <Check className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
-                  )}
                 </div>
-              ))}
-            </div>
+              )
+            })}
           </div>
 
+          {/* Settings button */}
           <button
-            onClick={() => {
-              LogPrint('Settings button clicked')
-              setShowSettings(true)
-              if (!cacheInfo) {
-                loadCacheInfo()
-              }
-            }}
-            className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors ${isDark ? 'text-neutral-400 hover:text-white hover:bg-[#1A1D23]' : 'text-neutral-600 hover:text-black hover:bg-gray-100'}`}
+            onClick={() => { setShowSettings(true); if (!cacheInfo) loadCacheInfo() }}
+            className="flex items-center gap-3 px-3 py-2 rounded-xl mt-4 transition-all"
+            style={{ color: onSurfVar }}
+            onMouseEnter={e => e.currentTarget.style.background = surf1}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
             <Settings className="w-5 h-5" />
             <span className="text-sm font-medium">Settings</span>
@@ -924,29 +917,31 @@ function App() {
         </div>
 
         {/* Main Content Area */}
-        <div className={`flex-1 rounded-xl overflow-hidden flex flex-col border ${isDark ? 'bg-[#0F1115] border-[#1A1D23]' : 'bg-white border-gray-200'}`}>
+        <div className="flex-1 overflow-hidden flex flex-col" style={{ background: surf1 }}>
           {selectedPlaylist ? (
             <>
-              {/* Playlist Header */}
-              <div className={`p-6 border-b ${isDark ? 'border-[#1A1D23]' : 'border-gray-100'}`}>
-                <div className="flex items-center gap-5">
-                  <div className={`w-32 h-32 rounded-xl shadow-2xl flex items-center justify-center flex-shrink-0 overflow-hidden ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
+              {/* Playlist Header — M3 Expressive: big display type, compact squircle cover */}
+              <div className="p-8 pb-6">
+                <div className="flex items-end gap-6">
+                  {/* Squircle cover art */}
+                  <div className="w-32 h-32 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center"
+                    style={{ background: surf2 }}>
                     {selectedPlaylist.coverData ? (
                       <img src={selectedPlaylist.coverData} alt={selectedPlaylist.name} className="w-full h-full object-cover" />
                     ) : selectedPlaylist.songs[0]?.coverData ? (
                       <img src={selectedPlaylist.songs[0].coverData} alt={selectedPlaylist.name} className="w-full h-full object-cover" />
                     ) : (
-                      <Album className={`w-14 h-14 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                      <Album className="w-14 h-14" style={{ color: onSurfVar }} />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Playlist</div>
-                    <h1 className={`text-4xl font-black mb-3 truncate ${isDark ? 'text-white' : 'text-black'}`}>{selectedPlaylist.name}</h1>
-                    <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                      <span className="flex items-center gap-1.5">
-                        <ListMusic className="w-4 h-4" />
-                        {selectedPlaylist.songs.length} songs
-                      </span>
+                  <div className="flex-1 min-w-0 pb-2">
+                    <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: onSurfVar }}>Playlist</div>
+                    <h1 className="text-6xl font-black leading-none tracking-tight truncate mb-3" style={{ color: onSurf }}>
+                      {selectedPlaylist.name}
+                    </h1>
+                    <div className="flex items-center gap-2 text-sm" style={{ color: onSurfVar }}>
+                      <ListMusic className="w-4 h-4" />
+                      <span className="font-medium">{selectedPlaylist.songs.length} songs</span>
                       {selectedPlaylist.description && (
                         <>
                           <span>•</span>
@@ -958,8 +953,8 @@ function App() {
                 </div>
               </div>
 
-              {/* Controls */}
-              <div className={`px-6 py-4 flex items-center gap-4 border-b ${isDark ? 'border-[#1A1D23] bg-[#0F1115]' : 'border-gray-100 bg-white'}`}>
+              {/* Controls — M3 FAB-style play button + tonal nightcore toggle */}
+              <div className="px-8 pb-6 flex items-center gap-4">
                 <button
                   onClick={() => {
                     if (selectedPlaylist.songs.length > 0) {
@@ -968,58 +963,65 @@ function App() {
                       playSong(selectedPlaylist.songs[validPosition], validPosition)
                     }
                   }}
-                  className="w-12 h-12 rounded-full flex items-center justify-center hover:scale-105 transition-all shadow-lg"
-                  style={{ backgroundColor: currentTheme.primary }}
+                  className="w-16 h-16 rounded-full flex items-center justify-center hover:scale-105 transition-all"
+                  style={{ 
+                    background: p,
+                    boxShadow: `0 2px 8px ${p}40`
+                  }}
                 >
                   {isPlaying && currentSong ? (
-                    <Pause className="w-6 h-6 text-white" />
+                    <Pause className="w-7 h-7 text-white" />
                   ) : (
-                    <Play className="w-6 h-6 text-white ml-0.5" />
+                    <Play className="w-7 h-7 text-white ml-0.5" />
                   )}
                 </button>
                 
                 <button
                   onClick={() => togglePlaylistNightcore(selectedPlaylist)}
-                  className={`transition-all duration-200 ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'}`}
+                  className="transition-all duration-200"
                   title="Toggle Nightcore Mode for Playlist"
                 >
                   {isProcessingNightcore ? (
-                    <div className="w-8 h-8 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: p }}></div>
                   ) : (
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                      selectedPlaylist.nightcoreMode
-                        ? 'text-pink-500 bg-pink-500/10 hover:bg-pink-500/20'
-                        : 'hover:bg-neutral-500/10'
-                    }`}>
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200"
+                      style={{
+                        background: selectedPlaylist.nightcoreMode ? surf2 : 'transparent',
+                        color: selectedPlaylist.nightcoreMode ? p : onSurfVar
+                      }}
+                      onMouseEnter={e => { if (!selectedPlaylist.nightcoreMode) e.currentTarget.style.background = surf2 }}
+                      onMouseLeave={e => { if (!selectedPlaylist.nightcoreMode) e.currentTarget.style.background = 'transparent' }}
+                    >
                       <Cat className="w-5 h-5" />
                     </div>
                   )}
                 </button>
 
-                <div className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-lg ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
-                  <Zap className={`w-4 h-4 ${selectedPlaylist.nightcoreMode ? 'text-pink-500' : (isDark ? 'text-neutral-500' : 'text-neutral-400')}`} />
-                  <span className={`text-sm font-medium ${selectedPlaylist.nightcoreMode ? 'text-pink-500' : (isDark ? 'text-neutral-400' : 'text-neutral-500')}`}>
+                <div className="flex-1 flex items-center gap-3 px-5 py-3 rounded-full" style={{ background: surf2 }}>
+                  <Zap className="w-4 h-4" style={{ color: selectedPlaylist.nightcoreMode ? p : onSurfVar }} />
+                  <span className="text-sm font-medium" style={{ color: selectedPlaylist.nightcoreMode ? p : onSurfVar }}>
                     {selectedPlaylist.nightcoreMode ? 'Nightcore Mode Active' : 'Nightcore Mode Off'}
                   </span>
                 </div>
               </div>
 
-              {/* Nightcore Progress Bar */}
+              {/* Nightcore Progress Bar — M3 tonal container */}
               {nightcoreProgress[selectedPlaylist?.name] && (
-                <div className="px-4 py-3 bg-purple-900/20 border-t border-purple-500/30">
+                <div className="mx-6 mb-4 px-4 py-3 rounded-2xl" style={{ background: `${p}15` }}>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-                    <div className="text-sm text-purple-300 font-medium">
+                    <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: p }}></div>
+                    <div className="text-sm font-semibold" style={{ color: p }}>
                       Processing Nightcore Mode...
                     </div>
                   </div>
-                  <div className="text-xs text-purple-200 mb-2">
+                  <div className="text-xs mb-2" style={{ color: pAlpha(0.7) }}>
                     {nightcoreProgress[selectedPlaylist.name].current}/{nightcoreProgress[selectedPlaylist.name].total} - {nightcoreProgress[selectedPlaylist.name].songTitle}
                   </div>
-                  <div className="w-full bg-purple-900/50 rounded-full h-2">
+                  <div className="w-full rounded-full h-1.5 overflow-hidden" style={{ background: `${p}22` }}>
                     <div 
-                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                      className="h-full rounded-full transition-all duration-300"
                       style={{ 
+                        background: p,
                         width: `${(nightcoreProgress[selectedPlaylist.name].current / nightcoreProgress[selectedPlaylist.name].total) * 100}%` 
                       }}
                     ></div>
@@ -1027,154 +1029,161 @@ function App() {
                 </div>
               )}
 
-              {/* Song List */}
-              <div className="flex-1 overflow-y-auto">
-                <div className={`grid grid-cols-[auto_1fr_1fr_auto] gap-4 px-6 py-3 text-xs font-bold uppercase tracking-wider border-b sticky top-0 ${
-                  isDark
-                    ? 'text-neutral-500 border-[#1A1D23] bg-[#0F1115]'
-                    : 'text-neutral-500 border-gray-100 bg-white'
-                }`}>
+              {/* Song List — M3 tonal container rows */}
+              <div className="flex-1 overflow-y-auto px-8">
+                <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-4 px-3 py-3 text-[10px] font-bold uppercase tracking-widest sticky top-0 z-10"
+                  style={{ color: onSurfVar, background: surf1 }}>
                   <div className="w-8 text-center">#</div>
                   <div>Title</div>
                   <div>Album</div>
-                  <div className="pr-8"><Clock className="w-4 h-4 ml-auto" /></div>
+                  <div className="pr-8"><Clock className="w-3.5 h-3.5 ml-auto" /></div>
                 </div>
 
-                {selectedPlaylist.songs.map((song, index) => (
-                  <div
-                    key={index}
-                    onClick={() => playSong(song, index)}
-                    className={`grid grid-cols-[auto_1fr_1fr_auto] gap-4 px-6 py-3 mx-4 rounded-lg cursor-pointer group transition-all ${
-                      currentSong?.title === song.title
-                        ? (isDark ? 'bg-[#1A1D23]' : 'bg-gray-100')
-                        : (isDark ? 'hover:bg-[#15181E]' : 'hover:bg-gray-50')
-                    }`}
-                  >
-                    <div className={`flex items-center justify-center w-8 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                      {currentSong?.title === song.title && isPlaying ? (
-                        <div className="flex items-center gap-0.5">
-                          <span className="w-1 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                          <span className="w-1 h-4 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></span>
-                          <span className="w-1 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></span>
-                        </div>
-                      ) : (
-                        <>
-                          <span className="group-hover:hidden font-medium">{index + 1}</span>
-                          <Play className={`w-4 h-4 hidden group-hover:block ${isDark ? 'text-white' : 'text-black'}`} />
-                        </>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-11 h-11 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
-                        {song.coverData ? (
-                          <img src={song.coverData} alt={song.title} className="w-full h-full object-cover" />
+                {selectedPlaylist.songs.map((song, index) => {
+                  const active = currentSong?.title === song.title
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => playSong(song, index)}
+                      className="grid grid-cols-[auto_1fr_1fr_auto] gap-4 px-3 py-2.5 rounded-xl cursor-pointer group transition-all mb-0.5"
+                      style={{
+                        background: active ? surf2 : 'transparent'
+                      }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = surf2 }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
+                    >
+                      <div className="flex items-center justify-center w-8" style={{ color: onSurfVar }}>
+                        {active && isPlaying ? (
+                          <div className="flex items-center gap-0.5">
+                            <span className="w-0.5 h-3 rounded-full animate-pulse" style={{ background: p }}></span>
+                            <span className="w-0.5 h-4 rounded-full animate-pulse" style={{ background: p, animationDelay: '0.1s' }}></span>
+                            <span className="w-0.5 h-2 rounded-full animate-pulse" style={{ background: p, animationDelay: '0.2s' }}></span>
+                          </div>
                         ) : (
-                          <Music className={`w-5 h-5 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                          <>
+                            <span className="group-hover:hidden text-sm font-medium">{index + 1}</span>
+                            <Play className="w-4 h-4 hidden group-hover:block" style={{ color: onSurf }} />
+                          </>
                         )}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className={`font-medium truncate ${currentSong?.title === song.title ? 'text-green-500' : (isDark ? 'text-white' : 'text-black')}`}>
-                          {song.title}
+
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
+                          style={{ background: surf }}>
+                          {song.coverData ? (
+                            <img src={song.coverData} alt={song.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <Music className="w-4 h-4" style={{ color: onSurfVar }} />
+                          )}
                         </div>
-                        <div className={`text-sm truncate ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{song.artist}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium truncate" style={{ color: active ? p : onSurf }}>
+                            {song.title}
+                          </div>
+                          <div className="text-xs truncate" style={{ color: onSurfVar }}>{song.artist}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center text-sm truncate" style={{ color: onSurfVar }}>
+                        {selectedPlaylist.name}
+                      </div>
+
+                      <div className="flex items-center justify-end text-sm font-mono tabular-nums" style={{ color: onSurfVar }}>
+                        {song.duration}
                       </div>
                     </div>
-
-                    <div className={`flex items-center text-sm truncate ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>
-                      {selectedPlaylist.name}
-                    </div>
-
-                    <div className={`flex items-center justify-end text-sm font-mono ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>
-                      {song.duration}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <div className={`w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
-                  <Radio className={`w-10 h-10 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                <div className="w-24 h-24 rounded-3xl mx-auto mb-5 flex items-center justify-center" style={{ background: surf2 }}>
+                  <Radio className="w-12 h-12" style={{ color: onSurfVar }} />
                 </div>
-                <p className={`text-lg font-medium ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Select a playlist</p>
-                <p className={`text-sm mt-1 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`}>Choose from your library to start playing</p>
+                <p className="text-lg font-semibold mb-1" style={{ color: onSurf }}>Select a playlist</p>
+                <p className="text-sm" style={{ color: onSurfVar }}>Choose from your library to start playing</p>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Bottom Player Bar */}
+      {/* Bottom Player Bar — M3 Expressive */}
       {currentSong && (
-        <div className={`h-20 border-t px-4 flex items-center gap-4 ${
-          isDark
-            ? 'bg-[#0F1115] border-[#1A1D23]'
-            : 'bg-white border-gray-200'
-        }`}>
+        <div className="h-20 px-6 flex items-center gap-6" style={{ background: surf1, borderTop: `1px solid ${outline}` }}>
           {/* Song Info */}
           <div className="w-72 flex items-center gap-3">
-            <div className={`w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden shadow-lg ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: surf2 }}>
               {currentSong.coverData ? (
                 <img src={currentSong.coverData} alt={currentSong.title} className="w-full h-full object-cover" />
               ) : (
-                <Music className={`w-6 h-6 ${isDark ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                <Music className="w-6 h-6" style={{ color: onSurfVar }} />
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <div className={`font-medium text-sm truncate ${isDark ? 'text-white' : 'text-black'}`}>{currentSong.title}</div>
-              <div className={`text-xs truncate ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{currentSong.artist}</div>
+              <div className="font-semibold text-sm truncate" style={{ color: onSurf }}>{currentSong.title}</div>
+              <div className="text-xs truncate" style={{ color: onSurfVar }}>{currentSong.artist}</div>
             </div>
-            <button className={`transition-colors ${isDark ? 'text-neutral-500 hover:text-red-500' : 'text-neutral-400 hover:text-red-500'}`}>
+            <button className="transition-colors" style={{ color: onSurfVar }}
+              onMouseEnter={e => e.currentTarget.style.color = p}
+              onMouseLeave={e => e.currentTarget.style.color = onSurfVar}>
               <Heart className="w-5 h-5" />
             </button>
           </div>
 
           {/* Controls */}
           <div className="flex-1 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-3">
-              <button onClick={previousSong} className={`transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
+            <div className="flex items-center gap-4">
+              <button onClick={previousSong} className="transition-all" style={{ color: onSurfVar }}
+                onMouseEnter={e => { e.currentTarget.style.color = onSurf; e.currentTarget.style.transform = 'scale(1.1)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = onSurfVar; e.currentTarget.style.transform = 'scale(1)' }}>
                 <SkipBack className="w-5 h-5" />
               </button>
               <button
                 onClick={togglePlayPause}
-                className="w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
-                style={{ backgroundColor: currentTheme.primary }}
+                className="w-11 h-11 rounded-2xl flex items-center justify-center hover:scale-105 transition-transform"
+                style={{ background: p }}
               >
                 {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white ml-0.5" />}
               </button>
-              <button onClick={nextSong} className={`transition-colors ${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
+              <button onClick={nextSong} className="transition-all" style={{ color: onSurfVar }}
+                onMouseEnter={e => { e.currentTarget.style.color = onSurf; e.currentTarget.style.transform = 'scale(1.1)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = onSurfVar; e.currentTarget.style.transform = 'scale(1)' }}>
                 <SkipForward className="w-5 h-5" />
               </button>
             </div>
 
             <div className="flex items-center gap-3 w-full max-w-2xl">
-              <span className={`text-xs w-10 text-right font-mono ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{formatTime(currentTime)}</span>
+              <span className="text-xs w-10 text-right font-mono" style={{ color: onSurfVar }}>{formatTime(currentTime)}</span>
               <div
-                className={`flex-1 h-1.5 rounded-full cursor-pointer group ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-200'}`}
+                className="flex-1 h-1.5 rounded-full cursor-pointer group overflow-hidden"
+                style={{ background: surf2 }}
                 onClick={seekTo}
               >
                 <div
                   className="h-full rounded-full relative transition-all"
-                  style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%`, backgroundColor: currentTheme.primary }}
+                  style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%`, background: p }}
                 >
                   <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg"></div>
                 </div>
               </div>
-              <span className={`text-xs w-10 font-mono ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{formatTime(duration)}</span>
+              <span className="text-xs w-10 font-mono" style={{ color: onSurfVar }}>{formatTime(duration)}</span>
             </div>
           </div>
 
           {/* Volume */}
-          <div className="w-32 flex items-center gap-2">
-            <button onClick={() => setVolume(volume === 0 ? 0.7 : 0)} className={`${isDark ? 'text-neutral-500 hover:text-white' : 'text-neutral-400 hover:text-black'}`}>
+          <div className="w-32 flex items-center gap-3">
+            <button onClick={() => setVolume(volume === 0 ? 0.7 : 0)} className="transition-colors" style={{ color: onSurfVar }}
+              onMouseEnter={e => e.currentTarget.style.color = onSurf}
+              onMouseLeave={e => e.currentTarget.style.color = onSurfVar}>
               {volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </button>
-            <div className={`flex-1 h-1.5 rounded-full relative group ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-200'}`}>
+            <div className="flex-1 h-1.5 rounded-full relative group overflow-hidden" style={{ background: surf2 }}>
               <div
                 className="h-full rounded-full transition-all"
-                style={{ width: `${volume * 100}%`, backgroundColor: currentTheme.primary }}
+                style={{ width: `${volume * 100}%`, background: p }}
               ></div>
               <input
                 type="range"
@@ -1190,57 +1199,58 @@ function App() {
         </div>
       )}
 
-      {/* Settings Modal */}
+      {/* Settings Modal — M3 Expressive */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className={`rounded-2xl p-8 w-[520px] max-h-[85vh] overflow-y-auto shadow-2xl border ${isDark ? 'bg-[#0F1115] border-[#1A1D23]' : 'bg-white border-gray-200'}`}>
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.7)' }}>
+          <div className="rounded-3xl p-8 w-[540px] max-h-[85vh] overflow-y-auto" style={{ background: surf1 }}>
             <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-[#1A1D23]' : 'bg-gray-100'}`}>
-                  <Settings className={`w-5 h-5 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`} />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: surf2 }}>
+                  <Settings className="w-6 h-6" style={{ color: p }} />
                 </div>
-                <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Settings</h3>
+                <h3 className="text-3xl font-black tracking-tight" style={{ color: onSurf }}>Settings</h3>
               </div>
               <button
                 onClick={() => setShowSettings(false)}
-                className={`transition-colors p-2 rounded-lg ${isDark ? 'text-neutral-500 hover:text-white hover:bg-[#1A1D23]' : 'text-neutral-400 hover:text-black hover:bg-gray-100'}`}
+                className="transition-all p-2 rounded-2xl"
+                style={{ color: onSurfVar }}
+                onMouseEnter={e => e.currentTarget.style.background = surf2}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Theme */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
-                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Appearance</label>
+                  <Sparkles className="w-4 h-4" style={{ color: onSurfVar }} />
+                  <label className="text-xs font-bold uppercase tracking-widest" style={{ color: onSurfVar }}>Appearance</label>
                 </div>
 
                 {/* Dark/Light Mode */}
                 <div className="mb-5">
-                  <div className={`text-sm mb-3 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Theme Mode</div>
-                  <div className="flex gap-2">
+                  <div className="text-sm mb-3 font-medium" style={{ color: onSurf }}>Theme Mode</div>
+                  <div className="flex gap-3">
                     <button
                       onClick={() => saveTheme('dark')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border ${
-                        isDark
-                          ? 'text-white shadow-lg'
-                          : 'bg-gray-50 text-neutral-600 hover:bg-gray-100 border-gray-200'
-                      }`}
-                      style={isDark ? { backgroundColor: currentTheme.primary, borderColor: currentTheme.primary } : {}}
+                      className="flex-1 px-4 py-3.5 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2"
+                      style={{
+                        background: isDark ? p : surf2,
+                        color: isDark ? '#fff' : onSurfVar
+                      }}
                     >
                       <Moon className="w-4 h-4" />
                       Dark
                     </button>
                     <button
                       onClick={() => saveTheme('light')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border ${
-                        !isDark
-                          ? 'text-white shadow-lg'
-                          : 'bg-gray-50 text-neutral-600 hover:bg-gray-100 border-gray-200'
-                      }`}
-                      style={!isDark ? { backgroundColor: currentTheme.primary, borderColor: currentTheme.primary } : {}}
+                      className="flex-1 px-4 py-3.5 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2"
+                      style={{
+                        background: !isDark ? p : surf2,
+                        color: !isDark ? '#fff' : onSurfVar
+                      }}
                     >
                       <Sun className="w-4 h-4" />
                       Light
@@ -1250,19 +1260,20 @@ function App() {
 
                 {/* Accent Colors */}
                 <div>
-                  <div className={`text-sm mb-3 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Accent Color</div>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="text-sm mb-3 font-medium" style={{ color: onSurf }}>Accent Color</div>
+                  <div className="grid grid-cols-4 gap-3">
                     {Object.entries(colorThemes).map(([color, theme]) => (
                       <button
                         key={color}
                         onClick={() => setAccentColor(color)}
-                        className={`aspect-square rounded-xl transition-all border-2 ${
-                          accentColor === color ? 'border-white scale-105' : 'border-transparent hover:scale-105'
-                        }`}
-                        style={{ backgroundColor: theme.primary }}
+                        className="aspect-square rounded-2xl transition-all border-4 hover:scale-105"
+                        style={{
+                          backgroundColor: theme.primary,
+                          borderColor: accentColor === color ? surf : 'transparent'
+                        }}
                       >
                         <div className="w-full h-full rounded-xl flex items-center justify-center">
-                          {accentColor === color && <Check className="w-5 h-5 text-white" />}
+                          {accentColor === color && <Check className="w-6 h-6 text-white" />}
                         </div>
                       </button>
                     ))}
@@ -1273,62 +1284,55 @@ function App() {
               {/* Audio Effects */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Headphones className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
-                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Audio Effects</label>
+                  <Headphones className="w-4 h-4" style={{ color: onSurfVar }} />
+                  <label className="text-xs font-bold uppercase tracking-widest" style={{ color: onSurfVar }}>Audio Effects</label>
                 </div>
 
                 {!ffmpegAvailable && (
-                  <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                    <div className="text-yellow-500 text-sm font-medium flex items-center gap-2">
+                  <div className="mb-4 p-4 rounded-2xl" style={{ background: `${colorThemes.pink.primary}15` }}>
+                    <div className="font-semibold text-sm flex items-center gap-2 mb-1" style={{ color: colorThemes.pink.primary }}>
                       <Zap className="w-4 h-4" />
                       FFmpeg Required
                     </div>
-                    <div className="text-yellow-500/70 text-xs mt-1">
+                    <div className="text-xs" style={{ color: `${colorThemes.pink.primary}cc` }}>
                       Install FFmpeg to enable audio effects. Visit ffmpeg.org for installation instructions.
                     </div>
                   </div>
                 )}
 
                 {/* Crossfade */}
-                <div className={`flex items-center justify-between p-4 rounded-xl mb-3 border ${isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="flex items-center justify-between p-4 rounded-2xl mb-3" style={{ background: surf2 }}>
                   <div>
-                    <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>Crossfade</div>
-                    <div className={`text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Smooth transitions between songs</div>
+                    <div className="font-semibold" style={{ color: onSurf }}>Crossfade</div>
+                    <div className="text-xs mt-0.5" style={{ color: onSurfVar }}>Smooth transitions between songs</div>
                   </div>
                   <button
                     onClick={() => setCrossfadeEnabled(!crossfadeEnabled)}
-                    className={`w-12 h-6 rounded-full transition-all relative ${
-                      crossfadeEnabled ? 'shadow-lg' : (isDark ? 'bg-[#252830]' : 'bg-gray-300')
-                    }`}
-                    style={crossfadeEnabled ? { backgroundColor: currentTheme.primary } : {}}
+                    className="w-12 h-6 rounded-full transition-all relative"
+                    style={{ background: crossfadeEnabled ? p : surf3 }}
                   >
-                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
-                      crossfadeEnabled ? 'translate-x-6' : 'translate-x-0.5'
-                    }`}></div>
+                    <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm"
+                      style={{ transform: crossfadeEnabled ? 'translateX(24px)' : 'translateX(2px)' }}></div>
                   </button>
                 </div>
 
                 {/* Bass Boost */}
-                <div className={`flex items-center justify-between p-4 rounded-xl border ${
-                  ffmpegAvailable 
-                    ? (isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200') 
-                    : (isDark ? 'bg-[#1A1D23]/50 border-[#252830]/50' : 'bg-gray-50 border-gray-200')
-                }`}>
+                <div className="flex items-center justify-between p-4 rounded-2xl" style={{
+                  background: surf2,
+                  opacity: ffmpegAvailable ? 1 : 0.5
+                }}>
                   <div>
-                    <div className={`font-medium ${ffmpegAvailable ? (isDark ? 'text-white' : 'text-black') : (isDark ? 'text-neutral-600' : 'text-neutral-400')}`}>Bass Boost</div>
-                    <div className={`text-xs ${ffmpegAvailable ? (isDark ? 'text-neutral-500' : 'text-neutral-500') : (isDark ? 'text-neutral-600' : 'text-neutral-400')}`}>Enhanced low frequencies (+10dB @ 200Hz)</div>
+                    <div className="font-semibold" style={{ color: onSurf }}>Bass Boost</div>
+                    <div className="text-xs mt-0.5" style={{ color: onSurfVar }}>Enhanced low frequencies (+10dB @ 200Hz)</div>
                   </div>
                   <button
                     onClick={() => ffmpegAvailable && setBassBoostEnabled(!bassBoostEnabled)}
                     disabled={!ffmpegAvailable}
-                    className={`w-12 h-6 rounded-full transition-all relative ${
-                      bassBoostEnabled && ffmpegAvailable ? 'shadow-lg' : (isDark ? 'bg-[#252830]' : 'bg-gray-300')
-                    } ${!ffmpegAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={bassBoostEnabled && ffmpegAvailable ? { backgroundColor: currentTheme.primary } : {}}
+                    className="w-12 h-6 rounded-full transition-all relative"
+                    style={{ background: bassBoostEnabled && ffmpegAvailable ? p : surf3 }}
                   >
-                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
-                      bassBoostEnabled && ffmpegAvailable ? 'translate-x-6' : 'translate-x-0.5'
-                    }`}></div>
+                    <div className="absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm"
+                      style={{ transform: bassBoostEnabled && ffmpegAvailable ? 'translateX(24px)' : 'translateX(2px)' }}></div>
                   </button>
                 </div>
               </div>
@@ -1336,30 +1340,31 @@ function App() {
               {/* Storage */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Disc3 className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
-                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Storage</label>
+                  <Disc3 className="w-4 h-4" style={{ color: onSurfVar }} />
+                  <label className="text-xs font-bold uppercase tracking-widest" style={{ color: onSurfVar }}>Storage</label>
                 </div>
 
-                <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="p-4 rounded-2xl" style={{ background: surf2 }}>
                   <div className="flex items-center justify-between mb-3">
-                    <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>Audio Effects Cache</div>
+                    <div className="font-semibold" style={{ color: onSurf }}>Audio Effects Cache</div>
                     <button
                       onClick={clearCache}
                       disabled={!cacheInfo}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                        cacheInfo 
-                          ? 'bg-red-500 hover:bg-red-600 text-white' 
-                          : (isDark ? 'bg-[#252830] text-neutral-500' : 'bg-gray-200 text-neutral-400') + ' cursor-not-allowed'
-                      }`}
+                      className="px-4 py-2 text-xs font-bold rounded-2xl transition-all"
+                      style={{
+                        background: cacheInfo ? colorThemes.pink.primary : surf3,
+                        color: cacheInfo ? '#fff' : onSurfVar,
+                        opacity: cacheInfo ? 1 : 0.5
+                      }}
                     >
                       Clear Cache
                     </button>
                   </div>
-                  <div className={`text-sm ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  <div className="text-sm" style={{ color: onSurfVar }}>
                     {cacheInfo ? (
                       cacheInfo.exists ? (
-                        <div className="flex items-center gap-2">
-                          <span className={`font-mono text-xs ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>{cacheInfo.path}</span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono text-xs px-2 py-1 rounded-lg" style={{ background: surf3 }}>{cacheInfo.path}</span>
                           <span>•</span>
                           <span>{cacheInfo.fileCount} files</span>
                           <span>•</span>
@@ -1378,15 +1383,15 @@ function App() {
               {/* Debug */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <MoreHorizontal className={`w-4 h-4 ${isDark ? 'text-neutral-500' : 'text-neutral-400'}`} />
-                  <label className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>Debug</label>
+                  <MoreHorizontal className="w-4 h-4" style={{ color: onSurfVar }} />
+                  <label className="text-xs font-bold uppercase tracking-widest" style={{ color: onSurfVar }}>Debug</label>
                 </div>
 
-                <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#1A1D23] border-[#252830]' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="p-4 rounded-2xl" style={{ background: surf2 }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>Cover Art Server</div>
-                      <div className={`text-xs mt-0.5 ${isDark ? 'text-neutral-500' : 'text-neutral-500'}`}>Test the local cover art server</div>
+                      <div className="font-semibold" style={{ color: onSurf }}>Cover Art Server</div>
+                      <div className="text-xs mt-0.5" style={{ color: onSurfVar }}>Test the local cover art server</div>
                     </div>
                     <button
                       onClick={async () => {
@@ -1404,7 +1409,8 @@ function App() {
                           LogPrint(`Debug error: ${err.message}`)
                         }
                       }}
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-all"
+                      className="px-4 py-2 text-xs font-bold rounded-2xl transition-all"
+                      style={{ background: colorThemes.blue.primary, color: '#fff' }}
                     >
                       Test Server
                     </button>

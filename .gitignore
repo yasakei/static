@@ -1,6 +1,6 @@
 # Wails build outputs
-build/
 wails_build_*
+bin/
 
 # Go
 *.exe
@@ -60,7 +60,6 @@ frontend/bindings/
 
 # Task runner
 .task/
-Taskfile.yml
 
 # Logs
 *.log
